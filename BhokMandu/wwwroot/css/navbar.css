@@ -1,0 +1,12 @@
+﻿.navbar-nav .navbar-text {
+    line-height: 10px; /* Match the navbar height to align properly */
+}
+
+/*.navbar-text{
+    padding-top: 1%;
+}*/
+
+.navbar-nav .nav-item {
+    display: flex;
+    align-items: center; /* Ensures vertical centering of username and logout button */
+}

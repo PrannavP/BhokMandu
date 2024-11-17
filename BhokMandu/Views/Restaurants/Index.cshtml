@@ -1,0 +1,52 @@
+﻿@model IEnumerable<BhokMandu.Models.Restaurant>
+
+@{
+    ViewData["Title"] = "Restaurants";
+}
+
+<h1>Restaurants</h1>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<!-- Search Form -->
+<form asp-action="Index" method="get" class="mb-4">
+    <div class="form-group">
+        <input type="text" name="searchString" class="form-control" placeholder="Search by Restaurant Name" value="@ViewData["searchString"]" />
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<!-- Card Layout -->
+<div class="row">
+    @if (Model.Any())
+    {
+        foreach (var restaurant in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@restaurant.RestaurantName</h5>
+                        <p class="card-text">
+                            <strong>Location:</strong> @restaurant.Address<br />
+                            <strong>Contact:</strong> @restaurant.PhoneNumber<br />
+                            <strong>Opening Hours:</strong> @restaurant.OpeningHours<br />
+                            <strong>Rating:</strong> @restaurant.Rating
+                        </p>
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Edit" asp-route-id="@restaurant.Id" class="btn btn-outline-secondary">Edit</a>
+                            <a asp-action="Details" asp-route-id="@restaurant.Id" class="btn btn-outline-primary">Details</a>
+                            <a asp-action="Delete" asp-route-id="@restaurant.Id" class="btn btn-outline-danger">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <p>No restaurants found.</p>
+        </div>
+    }
+</div>

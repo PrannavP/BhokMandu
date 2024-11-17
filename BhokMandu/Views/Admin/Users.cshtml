@@ -1,0 +1,32 @@
+﻿@{
+	ViewData["Title"] = "Manage Users";
+}
+
+<h2>Manage Users</h2>
+
+<div class="container">
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Full Name</th>
+				<th>Email</th>
+				<th>Role</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach(var user in Model)
+			{
+				<tr>
+					<td>@user.FullName</td>
+					<td>@user.Email</td>
+					<td>@user.Role</td>
+					<td>
+						<a href="@Url.Action("Edit", "Admin", new { id = user.Id })" class="btn btn-warning btn-sm">Edit</a>
+						<a href="@Url.Action("Delete", "Admin", new { id = user.Id })" class="btn btn-danger btn-sm">Delete</a>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>

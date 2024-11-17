@@ -1,0 +1,71 @@
+﻿@model BhokMandu.Models.FoodCategoryViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Foods</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<form asp-controller="Foods" asp-action="Index" method="get">
+    <p>
+        <select asp-for="FoodCategory" asp-items="Model.Categories">
+            <option value="">All</option>
+        </select>
+
+        <label>Name: <input type="text" asp-for="SearchString" /></label>
+        <input type="submit" value="Filter" />
+    </p>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Foods![0].Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Foods![0].Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Foods![0].Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Foods![0].Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Foods![0].Rating)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Foods) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Rating)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,59 @@
+﻿@model BhokMandu.Models.Restaurant
+
+@{
+	ViewData["Title"] = "Edit Restaurant Details";
+}
+
+<h1>Edit Restaurant Details</h1>
+<hr />
+<div class="row">
+	<div class="col-md-4">
+		<form asp-action="Edit">
+			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+			<input type="hidden" asp-for="Id" />
+			
+			<div class="form-group">
+				<label asp-for="RestaurantName" class="control-label"></label>
+				<input asp-for="RestaurantName" class="form-control" />
+				<span asp-validation-for="RestaurantName" class="text-danger"></span>
+			</div>
+
+			<div class="form-group">
+				<label asp-for="Address" class="control-label"></label>
+				<input asp-for="Address" class="form-control" />
+				<span asp-validation-for="Address" class="text-danger"></span>
+			</div>
+
+			<div class="form-group">
+				<label asp-for="PhoneNumber" class="control-label"></label>
+				<input asp-for="PhoneNumber" class="form-control" />
+				<span asp-validation-for="PhoneNumber" class="text-danger"></span>
+			</div>
+
+			<div class="form-group">
+				<label asp-for="OpeningHours" class="control-label"></label>
+				<input asp-for="OpeningHours" class="form-control" />
+				<span asp-validation-for="OpeningHours" class="text-danger"></span>
+			</div>
+
+			<div class="form-group">
+				<label asp-for="Rating" class="control-label"></label>
+				<input asp-for="Rating" class="form-control" />
+				<span asp-validation-for="Rating" class="text-danger"></span>
+			</div>
+
+			<div class="form-group">
+				<input type="submit" value="Save" class="btn btn-primary" />
+			</div>
+
+		</form>
+	</div>
+</div>
+
+<div>
+	<a asp-action="Index">Back to Restaurants List</a>
+</div>
+
+@section Scripts{
+	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
