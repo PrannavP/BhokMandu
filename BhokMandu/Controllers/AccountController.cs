@@ -70,6 +70,11 @@ namespace BhokMandu.Controllers
 
                 if(user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
                 {
+
+                    Console.WriteLine(user.FullName);
+                    Console.WriteLine(user.Email);
+                    Console.WriteLine(user.PasswordHash);
+                    Console.WriteLine(user.Role);
                     // Store user info in a session
                     HttpContext.Session.SetString("Email", user.Email);
                     HttpContext.Session.SetString("FullName", user.FullName);

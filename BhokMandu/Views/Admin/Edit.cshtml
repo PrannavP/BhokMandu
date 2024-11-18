@@ -2,6 +2,7 @@
 
 @{
 	ViewData["Title"] = "Edit User";
+	Layout = null;
 }
 
 <head>
@@ -19,7 +20,7 @@
 		<label for="Email">Email</label>
 		<input type="email" class="form-control" id="Email" name="Email" value="@Model.Email" required />
 	</div>
-    <div class="form-group">
+	<div class="form-group">
         <label for="Role">Role</label>
         <select class="form-control" id="Role" name="Role">
 			<option value="User" selected="@(Model.Role == "User")">User</option>

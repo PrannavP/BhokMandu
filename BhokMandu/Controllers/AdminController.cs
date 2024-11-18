@@ -113,34 +113,82 @@ namespace BhokMandu.Controllers
         [Authorize(Roles = "Admin")]
         [HttpPost("edit/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id, FullName, Email, PasswordHashed")] User user)
+		public async Task<IActionResult> Edit(int id, [Bind("Id,FullName,Email,Role")] User user)
+		{
+			if (id != user.Id)
+			{
+				return NotFound();
+			}
+
+			if (ModelState.IsValid)
+			{
+				try
+				{
+					// Fetch the existing user from the database
+					var existingUser = await _context.User.FindAsync(id);
+					if (existingUser == null)
+					{
+						return NotFound();
+					}
+
+					// Update the fields that are part of the form
+					existingUser.FullName = user.FullName;
+					existingUser.Email = user.Email;
+					existingUser.Role = user.Role;
+
+					// Save changes
+					await _context.SaveChangesAsync();
+				}
+				catch (DbUpdateConcurrencyException)
+				{
+					if (!UserExists(user.Id))
+					{
+						return NotFound();
+					}
+					else
+					{
+						throw;
+					}
+				}
+				return RedirectToAction("Users");
+			}
+
+			return View(user);
+		}
+
+
+		// GET: admin/users/delete/5
+		[HttpGet("delete/{id}")]
+        public async Task<IActionResult> Delete(int? id)
         {
-            if(id != user.Id)
+            if(id == null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
+            if(user == null)
             {
-                try
-                {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(user.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
+
             return View(user);
+        }
+
+        // POST: admin/user/delete/5
+        [HttpPost("delete/{id}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var user = await _context.User.FindAsync(id);
+            if(user != null)
+            {
+                _context.User.Remove(user);
+                Console.WriteLine(user);
+            }
+            
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Users");
         }
 
 		private bool UserExists(int id)
