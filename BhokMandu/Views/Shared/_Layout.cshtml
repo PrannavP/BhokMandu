@@ -30,7 +30,6 @@
                         </li>
                     </ul>
                     <ul class="navbar-nav ms-auto align-items-center">
-                        <!-- Added align-items-center here -->
                         @if (!string.IsNullOrEmpty(fullName))
                         {
                             @if (role != "Admin")
@@ -38,13 +37,12 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-dark position-relative" href="/Cart/Index">
                                         Cart
-                                        <span class="badge bg-danger"></span>
-                                    </a> <!-- Badge for displaying count -->
+                                        <span class="badge bg-danger" id="cart-count-badge">0</span> <!-- Ensure this ID matches -->
+                                    </a>
                                 </li>
                             }
                             <li class="nav-item align-self-center">
-                                <!-- Added align-self-center here -->
-                                <span class="navbar-text">Welcome, @fullName!</span> <!-- This will be aligned -->
+                                <span class="navbar-text">Welcome, @fullName!</span>
                             </li>
                             <li class="nav-item">
                                 <a class="btn btn-danger ms-2" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
@@ -68,7 +66,21 @@
         </main>
     </div>
 
-    <script src="/js/index.js"></script> <!-- Ensure this is included -->
+    <!-- Place scripts at the end of body -->
+    <script src="~/js/index.js"></script> <!-- Ensure this is included -->
+    <!-- Add script to update cart count after DOM is fully loaded -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const cartCount = localStorage.getItem('cartCount') || 0;
+            const cartCountBadge = document.getElementById('cart-count-badge');
+            if (cartCountBadge) {
+                cartCountBadge.textContent = cartCount; // Update badge with cart count
+            } else {
+                console.error("Cart count badge not found in DOM.");
+            }
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -13,4 +13,84 @@
     <h4>Total: Rs. <span id="total-amount">0</span></h4>
 </div>
 
+<div class="mt-4">
+    <button onclick="orderNow()" class="btn btn-primary">Order</button>
+</div>
+
 <script src="~/js/cart.js"></script>
+
+<script>
+    function displayCartItems() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const cartItemsContainer = document.getElementById('cart-items');
+        let totalAmount = 0;
+
+        // Clear previous cart items
+        cartItemsContainer.innerHTML = ''; // Clear existing items
+
+        // Check if the cart is empty
+        if (cart.length === 0) {
+            cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+            document.getElementById('total-amount').textContent = '0'; // Set total to 0
+            return;
+        }
+
+        // Loop through each item in the cart and display it
+        cart.forEach(item => {
+            const itemTotal = item.Quantity * item.Price; // Calculate total for this item
+            totalAmount += itemTotal; // Add to overall total
+
+            const itemElement = document.createElement('div');
+            itemElement.classList.add('cart-item');
+            itemElement.innerHTML = `
+                    <h5>${item.FoodName}</h5>
+                    <p>Quantity: ${item.Quantity}</p>
+                    <p>Price per unit: Rs. ${item.Price}</p>
+                    <p>Total: Rs. ${itemTotal}</p>
+                    <hr />
+                `;
+            cartItemsContainer.appendChild(itemElement);
+        });
+
+        // Update total amount in the DOM
+        document.getElementById('total-amount').textContent = totalAmount.toFixed(2); // Format total to 2 decimal places
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        displayCartItems(); // Display cart items on load
+    });
+
+    function orderNow() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        if (cart.length === 0) {
+            alert("Your cart is empty.");
+            return;
+        }
+
+        // Log cart data for debugging
+        console.log("Cart Data:", cart);
+
+        // Send cart data as JSON to OrderNow action
+        fetch('/Cart/OrderNow', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(cart)
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("Order placed successfully!");
+                    localStorage.removeItem('cart'); // Clear cart after successful order
+                    window.location.href = '/'; // Redirect to home or another page
+                } else {
+                    return response.json().then(err => { // Capture error response
+                        console.error('Error:', err);
+                        alert("Failed to place order: " + err.message);
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>

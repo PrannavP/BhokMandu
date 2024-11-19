@@ -17,5 +17,6 @@ namespace BhokMandu.Data
         public DbSet<Food> Food { get; set; } = default!;
         public DbSet<Restaurant> Restaurant { get; set; } = default!;
         public DbSet<User> User { get; set; } = default!;
+        public DbSet<Order> Order { get; set; }
     }
 }
