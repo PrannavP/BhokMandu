@@ -7,10 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BhokMandu.Data;
 using BhokMandu.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BhokMandu.Controllers
 {
     [Route("admin/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class RestaurantsController : Controller
     {
         private readonly BhokManduContext _context;

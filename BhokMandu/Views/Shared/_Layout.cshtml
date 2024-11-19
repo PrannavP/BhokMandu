@@ -14,18 +14,12 @@
     <title>@ViewData["Title"] - BhokMandu</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/BhokMandu.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/navbar.css" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BhokMandu</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
@@ -34,18 +28,23 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Foods" asp-action="Index">Foods</a>
                         </li>
-                        @if (role == "Admin")
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Dashboard">Admin Dashboard</a>
-                            </li>
-                        }
                     </ul>
-                    <ul class="navbar-nav ms-auto">
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        <!-- Added align-items-center here -->
                         @if (!string.IsNullOrEmpty(fullName))
                         {
-                            <li class="nav-item">
-                                <span class="navbar-text">Welcome, @fullName!</span>
+                            @if (role != "Admin")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark position-relative" href="/Cart/Index">
+                                        Cart
+                                        <span class="badge bg-danger"></span>
+                                    </a> <!-- Badge for displaying count -->
+                                </li>
+                            }
+                            <li class="nav-item align-self-center">
+                                <!-- Added align-self-center here -->
+                                <span class="navbar-text">Welcome, @fullName!</span> <!-- This will be aligned -->
                             </li>
                             <li class="nav-item">
                                 <a class="btn btn-danger ms-2" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
@@ -69,14 +68,7 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - BhokMandu - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="/js/index.js"></script> <!-- Ensure this is included -->
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

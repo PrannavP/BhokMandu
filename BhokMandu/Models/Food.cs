@@ -10,4 +10,5 @@ public class Food
     public decimal Price { get; set; }
     public string? Category { get; set; }
     public string? Rating { get; set; }
+    public string? ImagePath { get; set; }
 }

@@ -20,3 +20,7 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.navbar-text {
+    line-height: 1.5; /* Adjust as necessary */
+}

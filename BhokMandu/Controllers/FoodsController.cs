@@ -7,10 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BhokMandu.Data;
 using BhokMandu.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BhokMandu.Controllers
 {
     [Route("admin/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class FoodsController : Controller
     {
         private readonly BhokManduContext _context;
@@ -91,16 +93,33 @@ namespace BhokMandu.Controllers
         // POST: admin/foods/create
         [HttpPost("create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,Price,Category,Rating")] Food food)
+        public async Task<IActionResult> Create([Bind("Name,Description,Price,Category,Rating")] Food food, IFormFile? Image)
         {
             if (ModelState.IsValid)
             {
+                if (Image != null)
+                {
+                    // Your existing image upload logic
+                    var fileName = Path.GetFileName(Image.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await Image.CopyToAsync(stream);
+                    }
+
+                    food.ImagePath = "/images/" + fileName;
+                }
+
                 _context.Add(food);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(food);
         }
+
+
 
         // GET: admin/foods/edit/5
         [HttpGet("edit/{id}")]
@@ -119,10 +138,9 @@ namespace BhokMandu.Controllers
             return View(food);
         }
 
-        // POST: admin/foods/edit/5
         [HttpPost("edit/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,Category,Rating")] Food food)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,Category,Rating")] Food food, IFormFile? Image)
         {
             if (id != food.Id)
             {
@@ -133,7 +151,43 @@ namespace BhokMandu.Controllers
             {
                 try
                 {
-                    _context.Update(food);
+                    // Retrieve the existing food item
+                    var existingFood = await _context.Food.FindAsync(id);
+                    if (existingFood == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Update properties
+                    existingFood.Name = food.Name;
+                    existingFood.Description = food.Description;
+                    existingFood.Price = food.Price;
+                    existingFood.Category = food.Category;
+                    existingFood.Rating = food.Rating;
+
+                    // Handle image upload
+                    if (Image != null)
+                    {
+                        var fileName = Path.GetFileName(Image.FileName);
+                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+
+                        // Ensure the directory exists
+                        var directoryPath = Path.GetDirectoryName(filePath);
+                        if (!Directory.Exists(directoryPath))
+                        {
+                            Directory.CreateDirectory(directoryPath);
+                        }
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await Image.CopyToAsync(stream);
+                        }
+
+                        // Update ImagePath
+                        existingFood.ImagePath = "/images/" + fileName;
+                    }
+
+                    // Save changes
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -144,7 +198,7 @@ namespace BhokMandu.Controllers
                     }
                     else
                     {
-                        throw;
+                        throw; // Rethrow the exception for further handling
                     }
                 }
                 return RedirectToAction(nameof(Index));
