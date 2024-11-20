@@ -19,12 +19,23 @@ namespace BhokMandu.Controllers
             _context = context;
         }
 
-        [HttpGet("")]
-        public async Task<IActionResult> Index()
+        //[HttpGet("")]
+        public IActionResult Index(string searchQuery)
         {
-            var foods = await _context.Food.ToListAsync();
-            return View(foods);
+            // Retrieve all foods from the database
+            var foods = _context.Food.AsQueryable();
+
+            // If a search query is provided, filter the foods based on FoodName
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                foods = foods.Where(f => EF.Functions.Like(f.Name, $"%{searchQuery}%"));
+                ViewData["searchQuery"] = searchQuery; // Retain the search query in the input field
+            }
+
+            // Return the filtered or all foods to the view
+            return View(foods.ToList());
         }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
