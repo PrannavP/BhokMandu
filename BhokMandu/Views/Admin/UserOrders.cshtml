@@ -1,0 +1,81 @@
+﻿@model IEnumerable<Order>
+
+@{
+    ViewData["Title"] = "Manage Orders";
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-5">
+    <h1 class="mb-4">All User Orders</h1>
+
+    @Html.AntiForgeryToken()
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning" role="alert">
+            No orders have been placed yet.
+        </div>
+    }
+    else
+    {
+        <form method="post" id="orderStatusForm">
+
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer Name</th>
+                        <th>Order Date</th>
+                        <th>Total Amount</th>
+                        <th>Order Status</th>
+                        <th>Order Items</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td>@order.Id</td>
+                            <td>@order.CustomerName</td>
+                            <td>@order.OrderDate.ToString("dd MMM yyyy")</td>
+                            <td>@order.TotalAmount.ToString("C")</td>
+
+                            <td>
+                                <!-- Dropdown for changing order status -->
+                                <select class="form-select" name="status_@order.Id" id="status_@order.Id" onchange="updateStatus(@order.Id)">
+                                    @foreach (OrderStatus status in Enum.GetValues(typeof(OrderStatus)))
+                                    {
+                                        bool isSelected = (status == order.Status);
+                                        <option value="@status" selected="@(isSelected ? "selected" : null)">
+                                            @status
+                                        </option>
+                                    }
+                                </select>
+
+                            </td>
+
+                            <td>
+                                <ul>
+                                    @foreach (var item in order.Items)
+                                    {
+                                        <li>
+                                            <strong>@item.FoodName</strong>: @item.Quantity × @item.Price.ToString("C")
+                                        </li>
+                                    }
+                                </ul>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </form>
+    }
+</div>
+
+<input type="hidden" id="updateOrderStatusUrl" value="@Url.Action("UpdateOrderStatus", "Admin")" />
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Include jQuery -->
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Include your external JS file -->
+<script src="~/js/orderhistory.js"></script>

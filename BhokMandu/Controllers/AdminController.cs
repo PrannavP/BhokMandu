@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using System.Security.AccessControl;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BhokMandu.Controllers
 {
-	public class AdminController : Controller
+    public class AdminController : Controller
     {
         private readonly BhokManduContext _context;
 
@@ -30,8 +30,6 @@ namespace BhokMandu.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> AdminLogin(string email, string password, string? returnUrl = null)
         {
-            Console.WriteLine($"Attempting login with email: {email}, returnUrl: {returnUrl}");
-            // Replace with actual admin credential validation logic
             if (email == "admin@admin.com" && password == "admin")
             {
                 var claims = new List<Claim>
@@ -45,20 +43,14 @@ namespace BhokMandu.Controllers
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-                // Handle ReturnUrl
-                if (!string.IsNullOrEmpty(returnUrl))
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 {
-                    returnUrl = System.Web.HttpUtility.UrlDecode(returnUrl); // Decode the ReturnUrl
-                    if (Url.IsLocalUrl(returnUrl))
-                    {
-                        return Redirect(returnUrl); // Redirect to ReturnUrl if it's valid
-                    }
+                    return Redirect(returnUrl);
                 }
 
                 return RedirectToAction("Dashboard");
             }
 
-            // Invalid credentials
             ViewBag.ErrorMessage = "Invalid credentials";
             return View();
         }
@@ -67,9 +59,7 @@ namespace BhokMandu.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Dashboard()
         {
-            // Retrieve total users
             var totalUsers = _context.User.Count();
-
             ViewData["TotalUsers"] = totalUsers;
             return View();
         }
@@ -95,13 +85,13 @@ namespace BhokMandu.Controllers
         [HttpGet("edit/{id}")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
             var user = await _context.User.FindAsync(id);
-            if(user == null)
+            if (user == null)
             {
                 return NotFound();
             }
@@ -113,61 +103,57 @@ namespace BhokMandu.Controllers
         [Authorize(Roles = "Admin")]
         [HttpPost("edit/{id}")]
         [ValidateAntiForgeryToken]
-		public async Task<IActionResult> Edit(int id, [Bind("Id,FullName,Email,Role")] User user)
-		{
-			if (id != user.Id)
-			{
-				return NotFound();
-			}
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FullName,Email,Role")] User user)
+        {
+            if (id != user.Id)
+            {
+                return NotFound();
+            }
 
-			if (ModelState.IsValid)
-			{
-				try
-				{
-					// Fetch the existing user from the database
-					var existingUser = await _context.User.FindAsync(id);
-					if (existingUser == null)
-					{
-						return NotFound();
-					}
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var existingUser = await _context.User.FindAsync(id);
+                    if (existingUser == null)
+                    {
+                        return NotFound();
+                    }
 
-					// Update the fields that are part of the form
-					existingUser.FullName = user.FullName;
-					existingUser.Email = user.Email;
-					existingUser.Role = user.Role;
+                    existingUser.FullName = user.FullName;
+                    existingUser.Email = user.Email;
+                    existingUser.Role = user.Role;
 
-					// Save changes
-					await _context.SaveChangesAsync();
-				}
-				catch (DbUpdateConcurrencyException)
-				{
-					if (!UserExists(user.Id))
-					{
-						return NotFound();
-					}
-					else
-					{
-						throw;
-					}
-				}
-				return RedirectToAction("Users");
-			}
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!UserExists(user.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction("Users");
+            }
 
-			return View(user);
-		}
+            return View(user);
+        }
 
-
-		// GET: admin/users/delete/5
-		[HttpGet("delete/{id}")]
+        // GET: admin/users/delete/5
+        [HttpGet("delete/{id}")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
             var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
-            if(user == null)
+            if (user == null)
             {
                 return NotFound();
             }
@@ -181,19 +167,69 @@ namespace BhokMandu.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var user = await _context.User.FindAsync(id);
-            if(user != null)
+            if (user != null)
             {
                 _context.User.Remove(user);
-                Console.WriteLine(user);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction("Users");
         }
 
-		private bool UserExists(int id)
-		{
-			return _context.User.Any(e => e.Id == id);
-		}
-	}
+        // GET: /admin/order
+        [Authorize(Roles = "Admin")]
+        public IActionResult UserOrders()
+        {
+            var orders = _context.Order.Include(o => o.Items).ToList();
+            return View(orders);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateOrderStatus([FromBody] UpdateOrderStatusRequest request)
+        {
+            // Check if request is null
+            if (request == null)
+            {
+                return BadRequest(new { message = "Request cannot be null." });
+            }
+
+            Console.WriteLine($"Received OrderId: {request.OrderId}, Status: {request.Status}");
+
+            // Validate OrderId and Status
+            if (request.OrderId <= 0 || string.IsNullOrEmpty(request.Status))
+            {
+                return BadRequest(new { message = "Invalid order ID or status." });
+            }
+
+            // Retrieve the order from the database
+            var order = await _context.Order.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == request.OrderId);
+
+            // Check if order was found
+            if (order == null)
+            {
+                return NotFound(new { message = "Order not found." });
+            }
+
+            // Convert string status back to enum
+            if (Enum.TryParse<OrderStatus>(request.Status, true, out var orderStatus))
+            {
+                order.Status = orderStatus; // Update the order status with the parsed enum value
+            }
+            else
+            {
+                return BadRequest(new { message = "Invalid status value." });
+            }
+
+            // Save changes to the database
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Order status updated successfully." });
+        }
+
+        private bool UserExists(int id)
+        {
+            return _context.User.Any(e => e.Id == id);
+        }
+    }
 }

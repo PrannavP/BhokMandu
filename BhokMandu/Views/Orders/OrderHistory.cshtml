@@ -1,0 +1,56 @@
+﻿@model IEnumerable<Order>
+
+@{
+    ViewData["Title"] = "Your Orders";
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-5">
+    <h1 class="mb-4">Your Orders</h1>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning" role="alert">
+            You have not placed any orders yet.
+        </div>
+    }
+    else
+    {
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Order Date</th>
+                    <th>Total Amount</th>
+                    <th>Order Status</th>
+                    <th>Order Items</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>@order.Id</td>
+                        <td>@order.OrderDate.ToString("dd MMM yyyy")</td>
+                        <td>@order.TotalAmount.ToString("C")</td>
+                        <td>@order.Status.ToString()</td> <!-- Show order status -->
+
+                        <td>
+                            <ul>
+                                @foreach (var item in order.Items)
+                                {
+                                    <li>
+                                        <strong>@item.FoodName</strong>:
+                                        @item.Quantity × @item.Price.ToString("C")
+                                    </li>
+                                }
+                            </ul>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

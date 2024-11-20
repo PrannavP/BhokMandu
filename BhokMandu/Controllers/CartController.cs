@@ -41,7 +41,8 @@ namespace BhokMandu.Controllers
                 CustomerName = customerName,
                 OrderDate = DateTime.Now,
                 TotalAmount = CalculateTotalAmount(cartItems),
-                Items = cartItems
+                Items = cartItems,
+                Status = OrderStatus.Pending
             };
 
             _context.Order.Add(order);
