@@ -1,0 +1,29 @@
+﻿@model IEnumerable<Feedback>
+
+@{
+    ViewData["Title"] = "User Feedbacks";
+    Layout = "_AdminLayout";  // Automatically applies the layout
+}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">User Feedbacks</h1>
+
+    <div class="row">
+        @foreach (var feedback in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">@feedback.FullName</h5>
+                        <h6 class="card-subtitle text-muted mb-2">@feedback.Email</h6>
+                        <p class="card-text">@feedback.Message</p>
+                        <footer class="blockquote-footer">
+                            Submitted on: <cite>@feedback.CreatedAt.ToString("MMMM dd, yyyy h:mm tt")</cite>
+                        </footer>
+                    </div>
+                    <!-- <a href="mailto:@feedback.Email">Send to @feedback.FullName</a> -->
+                </div>
+            </div>
+        }
+    </div>
+</div>

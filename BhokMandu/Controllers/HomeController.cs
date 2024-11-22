@@ -22,6 +22,8 @@ namespace BhokMandu.Controllers
         //[HttpGet("")]
         public IActionResult Index(string searchQuery)
         {
+            Console.WriteLine(HttpContext.Session.GetString("FullName"));
+
             // Retrieve all foods from the database
             var foods = _context.Food.AsQueryable();
 

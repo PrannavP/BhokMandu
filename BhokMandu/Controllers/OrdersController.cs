@@ -1,4 +1,5 @@
 ﻿using BhokMandu.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,7 @@ namespace BhokMandu.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = "User")]
         public IActionResult OrderHistory()
         {
             string customerName = HttpContext.Session.GetString("FullName");

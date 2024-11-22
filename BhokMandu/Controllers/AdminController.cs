@@ -227,6 +227,16 @@ namespace BhokMandu.Controllers
             return Ok(new { message = "Order status updated successfully." });
         }
 
+        // feedback
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UserFeedbacks()
+        {
+            // Fetch all feedbacks from db
+            var feedbacks = await _context.FeedBack.ToListAsync();
+
+            return View(feedbacks);
+        }
+
         private bool UserExists(int id)
         {
             return _context.User.Any(e => e.Id == id);

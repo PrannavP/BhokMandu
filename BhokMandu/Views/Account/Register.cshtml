@@ -2,6 +2,13 @@
     ViewData["Title"] = "Register";
 }
 
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+    </div>
+}
+
 <div class="container mt-5">
     <h2 class="text-center mb-4">Create an account and start ordering tastyyy fooood</h2>
     <form asp-action="Register" method="post" class="mx-auto" style="max-width: 400px;">
@@ -19,4 +26,9 @@
         </div>
         <button type="submit" class="btn btn-primary w-100">Create</button>
     </form>
+
+    <!-- Link to Login page -->
+    <div class="mt-3 text-center">
+        <p>Already have an account? <a href="/Account/Login" class="text-primary" style="text-decoration: none;">Login here</a></p>
+    </div>
 </div>

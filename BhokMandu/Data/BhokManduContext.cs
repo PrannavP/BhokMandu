@@ -19,6 +19,8 @@ namespace BhokMandu.Data
         public DbSet<User> User { get; set; } = default!;
         public DbSet<Order> Order { get; set; }
         public DbSet<OrderItem> OrderItem { get; set; }
+
+        public DbSet<Feedback> FeedBack { get; set; }
         public DbSet<UpdateOrderStatusRequest> UpdateOrderStatusRequest { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

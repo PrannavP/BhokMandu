@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Feedback Page";
+    Layout = "_Layout";
+}
+
+@if(TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<form asp-action="Create">
+    <div class="mb-3">
+        <label for="fullname" class="form-label">Full Name</label>
+        <input type="text" class="form-control" name="fullname" id="fullname">
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="text" class="form-control" name="email" id="email">
+    </div>
+    <div class="mb-3">
+        <label for="phonenumber" class="form-label">Phone Number</label>
+        <input type="number" class="form-control" name="phonenumber" id="phonenumber">
+    </div>
+    <div class="mb-3">
+        <label for="phonenumber" class="form-label">Message</label>
+        <textarea class="form-control" name="message" id="message" rows="5" cols="5"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

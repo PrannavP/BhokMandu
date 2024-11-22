@@ -37,7 +37,8 @@ namespace BhokMandu.Controllers
                 // Check if the username or email is already in use
                 if (_context.User.Any(u => u.FullName == fullname || u.Email == email))
                 {
-                    ModelState.AddModelError("", "Name or Email is already taken.");
+                    ModelState.AddModelError("FullName or Email", "Name or Email is already taken.");
+                    Console.WriteLine("FullName or Email exists!!");
                     return View();
                 }
 
@@ -50,7 +51,8 @@ namespace BhokMandu.Controllers
                     FullName = fullname,
                     Email = email,
                     PasswordHash = passwordHash,
-                    Role = "User"
+                    Role = "User",
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 _context.User.Add(user);
