@@ -5,6 +5,13 @@
     Layout = "_AdminLayout";
 }
 
+<style>
+    .toast.text-bg-success {
+        background-color: #28a745; /* Greenish background */
+        color: white; /* White text for contrast */
+    }
+</style>
+
 <div class="container mt-5">
     <h1 class="mb-4">All User Orders</h1>
 
@@ -25,6 +32,7 @@
                     <tr>
                         <th>Order ID</th>
                         <th>Customer Name</th>
+                        <th>Phone Number</th>
                         <th>Order Date</th>
                         <th>Total Amount</th>
                         <th>Order Status</th>
@@ -37,8 +45,9 @@
                         <tr>
                             <td>@order.Id</td>
                             <td>@order.CustomerName</td>
+                            <td>@order.User.PhoneNumber</td>
                             <td>@order.OrderDate.ToString("dd MMM yyyy")</td>
-                            <td>@order.TotalAmount.ToString("C")</td>
+                            <td>Nrs.@order.TotalAmount.ToString("0.00")</td>
 
                             <td>
                                 <!-- Dropdown for changing order status -->
@@ -59,7 +68,7 @@
                                     @foreach (var item in order.Items)
                                     {
                                         <li>
-                                            <strong>@item.FoodName</strong>: @item.Quantity × @item.Price.ToString("C")
+                                            <strong>@item.FoodName</strong>: @item.Quantity × Nrs. @item.Price.ToString("0.00")
                                         </li>
                                     }
                                 </ul>
@@ -70,6 +79,18 @@
             </table>
         </form>
     }
+</div>
+
+<!-- Toast container -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <div id="statusToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                Status updated successfully!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
 </div>
 
 <input type="hidden" id="updateOrderStatusUrl" value="@Url.Action("UpdateOrderStatus", "Admin")" />

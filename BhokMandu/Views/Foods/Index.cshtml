@@ -8,7 +8,7 @@
 <h1>Foods</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
 </p>
 
 <form asp-controller="Foods" asp-action="Index" method="get">
@@ -18,7 +18,7 @@
         </select>
 
         <label>Name: <input type="text" asp-for="SearchString" /></label>
-        <input type="submit" value="Filter" />
+        <input type="submit" value="Filter" class="btn btn-secondary" />
     </p>
 </form>
 
@@ -49,39 +49,40 @@
         </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model.Foods) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Rating)
-            </td>
-            <td>
-                @if (!string.IsNullOrEmpty(item.ImagePath))
-                {
-                    <img src="@item.ImagePath" alt="@item.Name" style="width: 100px; height: auto;" />
-                }
-                else
-                {
-                    <span>No Image</span>
-                }
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.Foods)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Rating)
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.ImagePath))
+                    {
+                        <img src="@item.ImagePath" alt="@item.Name" style="width: 100px; height: auto;" />
+                    }
+                    else
+                    {
+                        <span>No Image</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

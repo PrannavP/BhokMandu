@@ -32,7 +32,7 @@
                     <tr>
                         <td>@order.Id</td>
                         <td>@order.OrderDate.ToString("dd MMM yyyy")</td>
-                        <td>@order.TotalAmount.ToString("C")</td>
+                        <td>Nrs. @order.TotalAmount.ToString("0.00")</td>
                         <td>@order.Status.ToString()</td> <!-- Show order status -->
 
                         <td>
@@ -41,7 +41,7 @@
                                 {
                                     <li>
                                         <strong>@item.FoodName</strong>:
-                                        @item.Quantity × @item.Price.ToString("C")
+                                        @item.Quantity × Nrs. @item.Price.ToString("0.00")
                                     </li>
                                 }
                             </ul>

@@ -17,15 +17,19 @@ namespace BhokMandu.Controllers
         public IActionResult OrderHistory()
         {
             string customerName = HttpContext.Session.GetString("FullName");
+            int? userId = HttpContext.Session.GetInt32("UserId");
 
-            if(string.IsNullOrEmpty(customerName))
+            if (string.IsNullOrEmpty(customerName) || userId == null)
             {
+                // Redirect to login if session values are not found
                 return RedirectToAction("Login", "Account");
             }
 
-            // Query orders and their associated items
+            // Debug logging to verify session data (remove in production)
+            Console.WriteLine($"FullName: {customerName}, UserId: {userId}");
+
             var userOrders = _context.Order
-                .Where(o => o.CustomerName == customerName)
+                .Where(o => o.UserId == userId.Value)
                 .Include(o => o.Items)
                 .ToList();
 

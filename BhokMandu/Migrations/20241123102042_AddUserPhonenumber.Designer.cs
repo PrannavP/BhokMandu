@@ -4,6 +4,7 @@ using BhokMandu.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BhokMandu.Migrations
 {
     [DbContext(typeof(BhokManduContext))]
-    partial class BhokManduContextModelSnapshot : ModelSnapshot
+    [Migration("20241123102042_AddUserPhonenumber")]
+    partial class AddUserPhonenumber
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,12 +169,7 @@ namespace BhokMandu.Migrations
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Order");
                 });
@@ -215,27 +213,11 @@ namespace BhokMandu.Migrations
                     b.ToTable("UpdateOrderStatusRequest");
                 });
 
-            modelBuilder.Entity("Order", b =>
-                {
-                    b.HasOne("BhokMandu.Models.User", "User")
-                        .WithMany("Orders")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("OrderItem", b =>
                 {
                     b.HasOne("Order", null)
                         .WithMany("Items")
                         .HasForeignKey("OrderId");
-                });
-
-            modelBuilder.Entity("BhokMandu.Models.User", b =>
-                {
-                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("Order", b =>

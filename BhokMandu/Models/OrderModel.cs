@@ -1,11 +1,17 @@
-﻿public class Order
+﻿using BhokMandu.Models;
+
+public class Order
 {
     public int Id { get; set; }
     public string? CustomerName { get; set; }
     public DateTime OrderDate { get; set; }
     public decimal TotalAmount { get; set; }
     public OrderStatus Status { get; set; }
-    public List<OrderItem> Items { get; set; }
+    // Foriegn key to the User Table
+    public int UserId { get; set; }
+    // Navigation property to User
+    public User User { get; set; }
+    public List<OrderItem> Items { get; set; } = new List<OrderItem>();
 }
 
 public enum OrderStatus

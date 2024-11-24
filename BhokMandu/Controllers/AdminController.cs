@@ -59,8 +59,18 @@ namespace BhokMandu.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Dashboard()
         {
-            var totalUsers = _context.User.Count();
+            ViewData["ActiveMenu"] = "Dashboard";
+
+            var totalUsers = _context.User.Count(u => u.Role == "User");
+            var totalOrders = _context.Order.Count();
+            var totalFoods = _context.Food.Count();
+
+            Console.WriteLine(_context.User.Count(u => u.Role == "User"));
+
             ViewData["TotalUsers"] = totalUsers;
+            ViewData["TotalOrders"] = totalOrders;
+            ViewData["TotalFoods"] = totalFoods;
+
             return View();
         }
 
@@ -68,6 +78,8 @@ namespace BhokMandu.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Users()
         {
+            ViewData["ActiveMenu"] = "Users";
+
             var users = _context.User.ToList();
             return View(users);
         }
@@ -100,8 +112,9 @@ namespace BhokMandu.Controllers
         }
 
         // POST: admin/users/edit/5
-        [Authorize(Roles = "Admin")]
+        // POST: admin/users/edit/5
         [HttpPost("edit/{id}")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,FullName,Email,Role")] User user)
         {
@@ -134,12 +147,13 @@ namespace BhokMandu.Controllers
                     }
                     else
                     {
-                        throw;
+                        throw; // Consider logging this exception for debugging
                     }
                 }
                 return RedirectToAction("Users");
             }
 
+            // Return view with validation errors
             return View(user);
         }
 
@@ -166,13 +180,33 @@ namespace BhokMandu.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var user = await _context.User.FindAsync(id);
-            if (user != null)
+            // Find the user by ID including related orders and order items
+            var user = await _context.User
+                .Include(u => u.Orders)  // Include related Orders (plural)
+                .ThenInclude(o => o.Items)  // Include related OrderItems for each Order
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
             {
-                _context.User.Remove(user);
+                return NotFound();
             }
 
+            // Delete related OrderItems first
+            foreach (var order in user.Orders)
+            {
+                _context.OrderItem.RemoveRange(order.Items);
+            }
+
+            // Delete orders
+            _context.Order.RemoveRange(user.Orders);
+
+            // Finally, delete the user
+            _context.User.Remove(user);
+
+            // Save changes to the database
             await _context.SaveChangesAsync();
+
+            // Redirect to Users list or another appropriate action
             return RedirectToAction("Users");
         }
 
@@ -180,7 +214,12 @@ namespace BhokMandu.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult UserOrders()
         {
-            var orders = _context.Order.Include(o => o.Items).ToList();
+            ViewData["ActiveMenu"] = "UserOrders";
+
+            var orders = _context.Order
+                                .Include(o => o.Items)
+                                .Include(o => o.User)
+                                .ToList();
             return View(orders);
         }
 
@@ -231,6 +270,8 @@ namespace BhokMandu.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UserFeedbacks()
         {
+            ViewData["ActiveMenu"] = "UserFeedbacks";
+
             // Fetch all feedbacks from db
             var feedbacks = await _context.FeedBack.ToListAsync();
 

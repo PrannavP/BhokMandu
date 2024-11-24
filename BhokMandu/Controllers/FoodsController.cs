@@ -33,7 +33,9 @@ namespace BhokMandu.Controllers
         //[HttpGet("/admin")]
         public async Task<IActionResult> Index(string foodCategory, string searchString)
         {
-            if(_context.Food == null)
+            ViewData["ActiveMenu"] = "Foods";
+
+            if (_context.Food == null)
             {
                 return Problem("Entity set 'BhokManduContext.Food' is null");
             }

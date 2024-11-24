@@ -6,6 +6,8 @@ using BhokMandu.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.General;
 
 namespace BhokMandu.Controllers
 {
@@ -30,7 +32,7 @@ namespace BhokMandu.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(string fullname, string email, string password)
+        public async Task<IActionResult> Register(string fullname, string email, string password, string phonenumber)
         {
             if (ModelState.IsValid)
             {
@@ -50,6 +52,7 @@ namespace BhokMandu.Controllers
                 {
                     FullName = fullname,
                     Email = email,
+                    PhoneNumber = phonenumber,
                     PasswordHash = passwordHash,
                     Role = "User",
                     CreatedAt = DateTime.UtcNow
@@ -66,57 +69,58 @@ namespace BhokMandu.Controllers
         }
 
         [HttpPost]
-		public async Task<IActionResult> Login(string email, string password)
-		{
-			if (ModelState.IsValid)
-			{
-				// Find the user by email
-				var user = await _context.User.FirstOrDefaultAsync(u => u.Email == email);
+        public async Task<IActionResult> Login(string email, string password)
+        {
+            if (ModelState.IsValid)
+            {
+                // Find the user by email
+                var user = await _context.User.FirstOrDefaultAsync(u => u.Email == email);
 
-				if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
-				{
-					// Create claims for authentication
-					var claims = new List<Claim>
-				{
-					new Claim(ClaimTypes.Email, user.Email),
-					new Claim(ClaimTypes.Name, user.FullName),
-					new Claim(ClaimTypes.Role, user.Role) // Set the role for the user
-                };
+                if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+                {
+                    // Create claims for authentication
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Email, user.Email),
+                        new Claim(ClaimTypes.Name, user.FullName),
+                        new Claim(ClaimTypes.Role, user.Role) // Set the role for the user
+                    };
 
-					var claimsIdentity = new ClaimsIdentity(claims, "Cookies");
-					var authProperties = new AuthenticationProperties
-					{
-						IsPersistent = true // This keeps the user logged in across sessions
-					};
+                    var claimsIdentity = new ClaimsIdentity(claims, "Cookies");
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = true // This keeps the user logged in across sessions
+                    };
 
-					// Sign in the user with the claims
-					await HttpContext.SignInAsync("Cookies", new ClaimsPrincipal(claimsIdentity), authProperties);
+                    // Sign in the user with the claims
+                    await HttpContext.SignInAsync("Cookies", new ClaimsPrincipal(claimsIdentity), authProperties);
 
-                    // Save fullname in session
+                    // Save data in session
                     HttpContext.Session.SetString("FullName", user.FullName);
+                    HttpContext.Session.SetInt32("UserId", user.Id); // Store UserId here
 
-					// Redirect based on role
-					if (user.Role == "Admin")
-					{
-						return RedirectToAction("Dashboard", "Admin");
-					}
-					else
-					{
-						return RedirectToAction("Index", "Home");
-					}
-				}
-				else
-				{
-					// Invalid credentials, add error to ModelState
-					ModelState.AddModelError("", "Invalid email or password.");
-				}
-			}
+                    // Redirect based on role
+                    if (user.Role == "Admin")
+                    {
+                        return RedirectToAction("Dashboard", "Admin");
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+                else
+                {
+                    // Invalid credentials, pass error message to the view
+                    ViewData["ErrorMessage"] = "Invalid email or password.";
+                }
+            }
 
-			return View();
-		}
+            return View();
+        }
 
 
-		[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ManageUsers()
         {
             return View();
@@ -152,6 +156,54 @@ namespace BhokMandu.Controllers
             HttpContext.Session.Clear();
             HttpContext.SignOutAsync("Cookies");
             return RedirectToAction("Login", "Account");
+        }
+
+        // user update password
+        [HttpPost]
+        [Authorize] // Ensure the user is authenticated
+        public async Task<IActionResult> UpdatePassword(string currentPassword, string newPassword, string confirmPassword)
+        {
+            // Check if the new password and confirm password match
+            if (newPassword != confirmPassword)
+            {
+                ModelState.AddModelError("ConfirmPassword", "New password and confirmation do not match.");
+                return View("Profile", await GetCurrentUser()); // Return to Profile view with error
+            }
+
+            // Get the email of the currently logged-in user from claims
+            var email = User.FindFirstValue(ClaimTypes.Email);
+
+            // Retrieve the user from the database
+            var user = await _context.User.FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            // Verify current password
+            if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash))
+            {
+                ModelState.AddModelError("CurrentPassword", "Current password is incorrect.");
+                return View("Profile", await GetCurrentUser()); // Return to Profile view with error
+            }
+
+            // Hash the new password and update it
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+            _context.User.Update(user);
+            await _context.SaveChangesAsync();
+
+            // Optionally, you can add a success message here
+            TempData["SuccessMessage"] = "Your password has been updated successfully.";
+
+            return RedirectToAction("Profile"); // Redirect to Profile after successful update
+        }
+
+        private async Task<User> GetCurrentUser()
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            return await _context.User.FirstOrDefaultAsync(u => u.Email == email);
         }
 
         public IActionResult Test()

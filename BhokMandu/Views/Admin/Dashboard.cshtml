@@ -16,12 +16,23 @@
                         <h2>Admin Dashboard</h2>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col text-center">
+                        <p>@DateTime.Now</p>
+                    </div>
+                </div>
                 <div class="row mt-4">
                     <div class="col-md-6 offset-md-3 text-center">
                         <h4>Welcome, Admin!</h4>
                         <p class="mt-3">Total Users: <strong>@ViewData["TotalUsers"]</strong></p>
+
+                        <p class="mt-3">Total Orders: <strong>@ViewData["TotalOrders"]</strong></p>
+
+                        <p class="mt-3">Total Foods: <strong>@ViewData["TotalFoods"]</strong></p>
+
                         <a href="@Url.Action("Users", "Admin")" class="btn btn-primary mt-2">Manage Users</a>
                         <a href="@Url.Action("Index", "Foods")" class="btn btn-primary mt-2">Manage Foods</a>
+                        <a href="@Url.Action("UserOrders", "Admin")" class="btn btn-primary mt-2">Manage Orders</a>
                         <br />
                         <a href="@Url.Action("Logout", "Admin")" class="btn btn-danger mt-2">Logout</a>
                     </div>

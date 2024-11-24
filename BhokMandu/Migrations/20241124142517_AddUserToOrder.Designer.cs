@@ -4,6 +4,7 @@ using BhokMandu.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BhokMandu.Migrations
 {
     [DbContext(typeof(BhokManduContext))]
-    partial class BhokManduContextModelSnapshot : ModelSnapshot
+    [Migration("20241124142517_AddUserToOrder")]
+    partial class AddUserToOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -218,7 +221,7 @@ namespace BhokMandu.Migrations
             modelBuilder.Entity("Order", b =>
                 {
                     b.HasOne("BhokMandu.Models.User", "User")
-                        .WithMany("Orders")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -231,11 +234,6 @@ namespace BhokMandu.Migrations
                     b.HasOne("Order", null)
                         .WithMany("Items")
                         .HasForeignKey("OrderId");
-                });
-
-            modelBuilder.Entity("BhokMandu.Models.User", b =>
-                {
-                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("Order", b =>

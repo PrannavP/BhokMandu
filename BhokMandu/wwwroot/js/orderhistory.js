@@ -20,7 +20,12 @@
         })
             .then(response => {
                 if (response.ok) {
-                    alert('Order status updated successfully.');
+                    // Trigger success toast
+                    const toastElement = document.getElementById('statusToast');
+                    const toast = new bootstrap.Toast(toastElement, {
+                        delay: 3000 // Toast will disappear after 3 seconds
+                    });
+                    toast.show();
                 } else {
                     return response.json().then(err => {
                         throw new Error(err.message);
@@ -28,8 +33,14 @@
                 }
             })
             .catch(error => {
-                alert('Error updating order status: ' + error.message);
                 console.error('Error:', error);
+                // Trigger error toast
+                const toastElement = document.getElementById('statusToast');
+                const toast = new bootstrap.Toast(toastElement, {
+                    delay: 3000
+                });
+                document.getElementById('statusToast').querySelector('.toast-body').textContent = 'Error updating order status: ' + error.message;
+                toast.show();
             });
     };
 });
