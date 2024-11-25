@@ -28,7 +28,39 @@ function addToCart(foodItem, price, foodId) {
     // Update displayed count in navbar
     updateCartCountDisplay(itemCount); // Call to update display
 
-    alert(`${quantity} x ${foodItem} added to the cart!`);
+    // Show the modal with the cart message
+    showCartModal(foodItem, quantity);
+}
+
+// Function to increase quantity
+function increaseQuantity(foodId) {
+    const quantityInput = document.getElementById(`quantity-${foodId}`);
+    let quantity = parseInt(quantityInput.value) || 0;
+    quantityInput.value = quantity + 1; // Increase by 1
+}
+
+// Function to decrease quantity
+function decreaseQuantity(foodId) {
+    const quantityInput = document.getElementById(`quantity-${foodId}`);
+    let quantity = parseInt(quantityInput.value) || 0;
+    if (quantity > 1) {
+        quantityInput.value = quantity - 1; // Decrease by 1, but not below 1
+    }
+}
+
+// Function to show the cart modal
+function showCartModal(foodItem, quantity) {
+    const cartModalMessage = document.getElementById("cartModalMessage");
+    cartModalMessage.textContent = `${quantity} x ${foodItem} has been added to your cart!`;
+
+    const modal = document.getElementById("cartModal");
+    modal.style.display = 'block'; // Show the modal
+}
+
+// Function to close the modal
+function closeModal() {
+    const modal = document.getElementById("cartModal");
+    modal.style.display = 'none'; // Hide the modal
 }
 
 // Function to update displayed cart count in navbar

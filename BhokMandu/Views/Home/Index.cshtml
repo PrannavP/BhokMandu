@@ -29,12 +29,34 @@
                     <li class="list-group-item">Price: Rs. @food.Price</li>
                 </ul>
                 <div class="input-group mb-3">
-                    <input type="number" class="form-control" id="quantity-@food.Id" value="0" min="1" />
-                    <button type="button" class="btn btn-primary" onclick="addToCart('@food.Name', @food.Price, @food.Id)">Add To Cart</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="decreaseQuantity(@food.Id)">-</button>
+                    <input type="number" class="form-control item-value" id="quantity-@food.Id" value="0" min="1" />
+                    <button type="button" class="btn btn-outline-secondary" onclick="increaseQuantity(@food.Id)">+</button>
                 </div>
+                <button type="button" class="btn btn-primary" onclick="addToCart('@food.Name', @food.Price, @food.Id)">Add To Cart</button>
             </div>
         </div>
     }
+</div>
+
+<div class="modal" id="cartModal" tabindex="-1" role="dialog" aria-labelledby="cartModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cartModalLabel">Item Added to Cart</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="cartModalMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Close</button>
+                <button type="button" class="btn btn-primary" onclick="window.location.href='/cart'">Go to Cart</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
